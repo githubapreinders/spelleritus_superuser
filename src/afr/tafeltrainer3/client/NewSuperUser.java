@@ -5,9 +5,7 @@ import afr.tafeltrainer3.shared.SuperUser;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -178,13 +176,9 @@ public class NewSuperUser extends Composite {
 			validusername = Validate.checkTextbox(username);
 			if(!validusername)
 			{
-				//lbl10.setVisible(true);
-				//lbl10.setStyleName("middellabels");
-				//Utilities.alertWidget(messages.newsuperuser_name(), messages.newsuperuser_validname(), messages).center();
 				alertwidget.getBox().setText(messages.newsuperuser_name());
 				alertwidget.getContentlabel().setText(messages.newsuperuser_validname());
 				alertwidget.getBox().center();
-				//lbl10.setText(NewSuperUser.infoString("naam"));
 				txt10.setText("");
 				txt10.setFocus(true);
 				txt10.setStyleName("page4invulbox_fout");
@@ -201,10 +195,6 @@ public class NewSuperUser extends Composite {
 			valid = Validate.checkEmail(email);
 			if(!valid)
 			{
-				//lbl20.setVisible(true);
-				//lbl20.setStyleName("middellabels");
-				//lbl20.setText(NewSuperUser.infoString("email"));
-				//Utilities.alertWidget(,messages.newsuperuser_emailcriteria(),messages).center();
 				alertwidget.getBox().setText(messages.newsuperuser_email());
 				alertwidget.getContentlabel().setText(messages.newsuperuser_emailcriteria());
 				alertwidget.getBox().center();
@@ -228,11 +218,6 @@ public class NewSuperUser extends Composite {
 				txt30b.setText("");
 				txt30a.setFocus(true);
 				txt30a.setStyleName("page4invulbox_fout");
-				//txt30b.setStyleName("page4invulbox_fout");
-				//lbl30b.setVisible(true);
-				//lbl30b.setStyleName("middellabels");
-				//lbl30b.setText(NewSuperUser.infoString("unequalpasswords"));
-				//Utilities.alertWidget(messages.newsuperuser_unequalpwds(), messages.newsuperuser_unequalpwdscriteria(), messages).center();
 				alertwidget.getBox().setText(messages.newsuperuser_unequalpwds());
 				alertwidget.getContentlabel().setText(messages.newsuperuser_unequalpwdscriteria());
 				alertwidget.getBox().center();
@@ -247,12 +232,8 @@ public class NewSuperUser extends Composite {
 				txt30a.setText("");
 				txt30b.setText("");
 				txt30a.setFocus(true);
-				//lbl30b.setVisible(true);
 				txt30a.setStyleName("page4invulbox_fout");
 				txt30b.setStyleName("page4invulbox_fout");
-				//lbl30b.setStyleName("middellabels");
-				//lbl30b.setText(NewSuperUser.infoString("password"));
-				//Utilities.alertWidget(messages.newsuperuser_invalidpw(), messages.newsuperuser_invalidpwcriteria(), messages).center();
 				alertwidget.getBox().setText(messages.newsuperuser_invalidpw());
 				alertwidget.getContentlabel().setText(messages.newsuperuser_invalidpwcriteria());
 				alertwidget.getBox().center();

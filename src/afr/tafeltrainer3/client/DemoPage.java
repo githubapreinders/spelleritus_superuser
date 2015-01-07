@@ -11,7 +11,6 @@ import com.google.gwt.user.client.ui.Image;
 public class DemoPage extends Composite 
 {
 
-private MainView main;
 private FlexTable flex1;
 private Image img1;
 public static int pagenumber = 1;

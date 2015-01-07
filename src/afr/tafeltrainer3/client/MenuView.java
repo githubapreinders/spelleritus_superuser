@@ -12,8 +12,6 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 
@@ -25,14 +23,12 @@ public class MenuView extends Composite {
 	private Anchor backtostart;
 	private FlexTable flex1;
 	private MainView main;
-	private HTML html1;
+	public HTML html1;
 	private Button btn1;
 	private Button btn2;
 	private Button btn3;
 	private Button btn4;
-	private Button btnsubmit;
 	public Label lbl12;
-	private VerticalPanel vpanel2;
 
 	public MenuView(MainView main,tafeltrainer3messages messages) {
 		
@@ -138,6 +134,7 @@ public class MenuView extends Composite {
 		@Override
 		public void onClick(ClickEvent event) 
 		{
+			main.menu.html1.setHTML("<h1>Spelleritus<h1>");
 			main.showPageStartPage();
 		}
 		
@@ -149,12 +146,7 @@ public class MenuView extends Composite {
 
 		@Override
 		public void onClick(ClickEvent event) {
-			btn1.setEnabled(false);
-			btn2.setEnabled(true);
-			btn3.setEnabled(true);
-			btn4.setEnabled(true);
-			main.showPageTafelTrainer();
-		}
+					}
 
 	}
 	
@@ -163,12 +155,7 @@ public class MenuView extends Composite {
 
 		@Override
 		public void onClick(ClickEvent event) {
-			btn2.setEnabled(false);
-			btn1.setEnabled(true);
-			btn3.setEnabled(true);
-			btn4.setEnabled(true);
-			main.showPageResultaten();
-
+			
 		}
 
 	}
@@ -178,12 +165,7 @@ public class MenuView extends Composite {
 
 		@Override
 		public void onClick(ClickEvent event) {
-			btn3.setEnabled(false);
-			btn1.setEnabled(true);
-			btn2.setEnabled(true);
-			btn4.setEnabled(true);
-			main.showPagePortemonnee();
-		}
+					}
 	}
 	
 	//toont de shop
@@ -191,12 +173,7 @@ public class MenuView extends Composite {
 
 		@Override
 		public void onClick(ClickEvent event) {
-			btn4.setEnabled(false);
-			btn1.setEnabled(true);
-			btn2.setEnabled(true);
-			btn3.setEnabled(true);
-			main.showPageWinkeltje();
-
+			
 		}
 
 	}

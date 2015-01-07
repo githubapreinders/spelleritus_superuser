@@ -8,7 +8,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Label;
 
 public class NewLeerlingWidget extends Composite 
 
@@ -17,7 +16,6 @@ private Button btndel;
 private Button btnedit;
 private Button btnresults;
 private HorizontalPanel hpanel1;
-private AdministratiePage addleerlingpage;
 private User user;
 	
 	public NewLeerlingWidget()
@@ -31,7 +29,6 @@ private User user;
 		hpanel1 = new HorizontalPanel();
 		initWidget(hpanel1);
 		this.user = user;
-		this.addleerlingpage = addleerlingpage;
 		HTML html1 = new HTML();
 		HTML html2 = new HTML();
 		HTML html3 = new HTML();

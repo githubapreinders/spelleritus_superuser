@@ -10,22 +10,17 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class LoginSuperUser extends Composite 
 {
 
-	private ClientImp client;
 	private MainView main;
 	private FlexTable flex1;
 	private HorizontalPanel hpanel00;
-	private Label lbl00;
 	private HTML html00;
-	private TextArea txtar10;
 	private HorizontalPanel hpanel10;
 	private HorizontalPanel hpanel20;
 	public TextBox txtlogin;

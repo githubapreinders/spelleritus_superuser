@@ -48,7 +48,6 @@ public class Adminpopup extends Composite
 		txt10b.setStyleName("page4invulbox");
 		txt10b.setText(user.getFamilyname());
 		
-		final Label lbl10 = new Label();
 		hpanel10.add(html10a);
 		hpanel10.add(txt10a);
 		hpanel10.add(html10b);
@@ -65,7 +64,7 @@ public class Adminpopup extends Composite
 		final TextBox txt20a = new TextBox();
 		txt20a.setText(user.getFamilyname());
 		txt20a.setStyleName("page4invulbox");
-		final Label lbl20 = new Label("");
+		new Label("");
 		
 		HTML html20b = new HTML("Wachtwoord : ");
 		html20b.setWidth("140px");
@@ -116,15 +115,15 @@ public class Adminpopup extends Composite
 		public void onClick(ClickEvent event) 
 		{
 			boolean valid=validate();
-			String username = txt10a.getText();
-			String familyname = txt10b.getText();
-			String loginname = txt20a.getText();
-			String passw = txt20b.getText();
+			txt10a.getText();
+			txt10b.getText();
+			txt20a.getText();
+			txt20b.getText();
 					
 			if(valid)
 			{
-				main.client.updateUser(new User(user.getId(),user.getEmailsuperuser(),
-						username,familyname,"my group",loginname,passw,0,rb1.getValue()));
+//				main.client.updateUser(new User(user.getId(),user.getEmailsuperuser(),
+//						username,familyname,loginname,passw,rb1.getValue()));
 				
 				box.hide();
 			}

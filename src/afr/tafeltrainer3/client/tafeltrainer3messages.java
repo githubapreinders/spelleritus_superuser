@@ -1,7 +1,6 @@
 package afr.tafeltrainer3.client;
 
 import com.google.gwt.i18n.client.Messages;
-import com.google.gwt.safehtml.shared.SafeHtml;
 
 public interface tafeltrainer3messages extends Messages 
 
@@ -29,6 +28,10 @@ public interface tafeltrainer3messages extends Messages
 	
 	@DefaultMessage("bekijk de demo")
 	String startpage_bekijkdedemo();
+	
+	@DefaultMessage("OK")
+	String startpage_ok();
+
 	
 	@DefaultMessage("inloggen begeleider")
 	String startpage_inloggenbeg();

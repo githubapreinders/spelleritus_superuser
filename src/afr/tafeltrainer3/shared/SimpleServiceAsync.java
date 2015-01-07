@@ -12,22 +12,12 @@ public interface SimpleServiceAsync  {
 
 	public void verifyMailadress(String parameter,@SuppressWarnings("rawtypes") AsyncCallback callback);
 	
-	public void getSuperuserFeedback(int userid, @SuppressWarnings("rawtypes") AsyncCallback callback);
-	
-	public void getUserFeedback(int userid, @SuppressWarnings("rawtypes") AsyncCallback callback);
-	
-	void sendMail(SuperUser superuser, AsyncCallback callback);
+	void sendMail(SuperUser superuser, @SuppressWarnings("rawtypes") AsyncCallback callback);
 	
 	public void superuserUpdatesUser(User user, @SuppressWarnings("rawtypes") AsyncCallback callback);
 	
 	public void updateSuperUser(SuperUser superuser, String oldemail,	@SuppressWarnings("rawtypes") AsyncCallback callback);
 	
-	public void getProducts(int userid, @SuppressWarnings("rawtypes") AsyncCallback callback);
-	
-	public void addProduct(int userid, Product product,@SuppressWarnings("rawtypes") AsyncCallback callback);
-	
-	public void getGroupResults(SuperUser superuser,@SuppressWarnings("rawtypes") AsyncCallback callback);
-
 	public void retrieveSuperUser(String loginname, String passw,	@SuppressWarnings("rawtypes") AsyncCallback callback);
 	
 	public void addNewSuperUser(SuperUser superuser,@SuppressWarnings("rawtypes") AsyncCallback callback);
@@ -38,20 +28,15 @@ public interface SimpleServiceAsync  {
 	
 	public void retrieveUser(String loginname,String passw, @SuppressWarnings("rawtypes") AsyncCallback callback);
 	
-	public void getFeedbackData(int id, @SuppressWarnings("rawtypes")AsyncCallback callback);
-	
 	public void getUser(String loginname,String passw, @SuppressWarnings("rawtypes") AsyncCallback callback);
 	
-	public void updateUser(User user,@SuppressWarnings("rawtypes") AsyncCallback callback) ;
-	
-	public void startQuiz(@SuppressWarnings("rawtypes") AsyncCallback callback);
-	
-	public void stopQuiz(@SuppressWarnings("rawtypes")AsyncCallback callback);
-	
-	public void submitQuestion(Opgave opg,int userid, @SuppressWarnings("rawtypes")AsyncCallback callback);
-
 	public void deleteUser(User user,@SuppressWarnings("rawtypes")AsyncCallback callback);
 
+	public void getWps(SuperUser superuser,@SuppressWarnings("rawtypes")AsyncCallback callback);
+
+	public void updateUser(User user, @SuppressWarnings("rawtypes")AsyncCallback callback);
+	
+	public void updateWoordpakket(Woordpakket wp, SuperUser su,@SuppressWarnings("rawtypes")AsyncCallback callback);
 	
 
 

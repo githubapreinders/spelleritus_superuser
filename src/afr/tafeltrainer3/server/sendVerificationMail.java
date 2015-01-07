@@ -1,9 +1,7 @@
 package afr.tafeltrainer3.server;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Properties;
-
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
@@ -39,9 +37,9 @@ public class sendVerificationMail
 			        	htmlpart.setContent(message,"text/html");
 			        mp.addBodyPart(htmlpart); 	
 		            Message msg = new MimeMessage(session);
-		            msg.setFrom(new InternetAddress(from, "Tafeltrainer gebruikersservice"));
+		            msg.setFrom(new InternetAddress(from, "Spelleritus gebruikersservice"));
 		            msg.addRecipient(Message.RecipientType.TO,
-		                             new InternetAddress(to, "Gebruiker Tafeltrainer"));
+		                             new InternetAddress(to, "Gebruiker Spelleritus"));
 		            msg.setSubject(subject);
 		            msg.setContent(mp);
 		            msg.setReplyTo(new InternetAddress[]{new InternetAddress(replyTo)});
@@ -74,7 +72,7 @@ public class sendVerificationMail
 							+ "nog worden bevestigd. U doet dit door op onderstaande link te klikken."
 							+ " Uw browser zal openen en er zal een boodschap komen dat u met "
 							+ "succes de inschrijving heeft voltooid.<BR><BR>";
-			String url = "<A href = 'http://1-dot-subtle-reserve-547.appspot.com"+"?"+"codestring="+superuser.getVerificationcode()+"'>"+
+			String url = "<A href = 'http://spelleritus-superuser.appspot.com"+"?"+"codestring="+superuser.getVerificationcode()+"'>"+
 					"link"+"</A>";	
 					
 			message = message + url;

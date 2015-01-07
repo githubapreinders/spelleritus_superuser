@@ -1,0 +1,68 @@
+.buttonCellBaseDefault {
+	border-radius: 8px;
+	border: 1px solid #3866A3;
+	background: -webkit-linear-gradient(90deg, #2875BD 5%, #6699cc 100%);
+	background: -moz-linear-gradient(90deg, #2875BD 5%, #6699cc 100%);
+	background: -ms-linear-gradient(90deg, #2875BD 5%, #6699cc 100%);
+	background: linear-gradient(180deg, #6699cc 5%, #2875BD 100%);
+	box-shadow: inset 1px 1px 0px 0px #BEE2F9;
+	color: #FFFFFF;
+	cursor: default;
+	display: inline-block;
+	font-family: futura, arial;
+	font-size: 14px;
+	font-weight: normal;
+	-moz-border-radius: 8px;
+	-moz-box-shadow: inset 1px 1px 0px 0px #BEE2F9;
+	padding: 4px 8px;
+	text-decoration: none;
+	text-shadow: 1px 1px 0px #5E5E5E;
+	-webkit-box-shadow: inset 1px 1px 0px 0px #BEE2F9;
+	-webkit-border-radius: 8px;
+	width: 130px;
+}
+
+.buttonCellBasePrimary {
+	background: #666;
+}
+
+.buttonCellBaseNegative {
+	background: #940000;
+	color: white;
+}
+
+.buttonCellBase:active { /* Only works in webkit based browsers. */
+	
+}
+
+.buttonCellBase:hover {
+	border-color: #939393;
+}
+
+.buttonCellBase[disabled] {
+	cursor: default;
+	color: #888;
+}
+
+.buttonCellBase[disabled]:hover {
+	border-color: #bbb #bbb #a0a0a0;
+}
+
+.buttonCellBasePushing {
+	border: 1px inset #ccc;
+}
+
+.buttonCellBaseCollapseLeft {
+	border-top-left-radius: 0px;
+	border-bottom-left-radius: 0px;
+	-moz-border-radius-topleft: 0px;
+	-moz-border-radius-bottomleft: 0px;
+}
+
+.buttonCellBaseCollapseRight {
+	border-right: none;
+	border-top-right-radius: 0px;
+	border-bottom-right-radius: 0px;
+	-moz-border-radius-topright: 0px;
+	-moz-border-radius-bottomright: 0px;
+}

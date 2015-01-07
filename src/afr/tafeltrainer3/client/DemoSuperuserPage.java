@@ -7,7 +7,6 @@ import com.google.gwt.user.client.ui.Frame;
 public class DemoSuperuserPage extends Composite 
 
 {
-private MainView main;
 private FlexTable flex1;
 	
 	public DemoSuperuserPage()

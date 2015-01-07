@@ -6,24 +6,18 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Random;
 
-import afr.tafeltrainer3.shared.Opgave;
-import afr.tafeltrainer3.shared.Product;
 import afr.tafeltrainer3.shared.SuperUser;
-import afr.tafeltrainer3.shared.TafelResult;
 import afr.tafeltrainer3.shared.User;
-import afr.tafeltrainer3.shared.UserResults;
+import afr.tafeltrainer3.shared.Woordpakket;
 
 import com.google.appengine.api.utils.SystemProperty;
 
 public class MySQLAccess
 {
 	private Connection connect;
-	private Statement statement = null;
 	private PreparedStatement preparedStatement = null;
 	private ResultSet resultSet = null;
 	public int flag = 0;
@@ -32,7 +26,6 @@ public class MySQLAccess
 
 	public MySQLAccess()
 	{
-		// this.messages = GWT.create(tafeltrainer3messages.class);
 	}
 
 	private Connection getConn()
@@ -55,7 +48,7 @@ public class MySQLAccess
 		{
 			url = "jdbc:mysql://localhost/";
 			driver = "com.mysql.jdbc.Driver";
-			db = "tafeltrainer";
+			db = "spelleritus";
 			user = "root";
 			pass = "Osiris74";
 		}
@@ -96,7 +89,7 @@ public class MySQLAccess
 		try
 		{
 			connect = getConn();
-			preparedStatement = connect.prepareStatement("select * from tafeltrainer.begeleider" + " where email = '"
+			preparedStatement = connect.prepareStatement("select * from spelleritus.begeleider" + " where email = '"
 					+ emailadress + "'");
 			resultSet = preparedStatement.executeQuery();
 			if (resultSet.next())
@@ -107,17 +100,16 @@ public class MySQLAccess
 				su = new SuperUser(resultSet.getString("name"), emailadress, password);
 				Encrypter e = Encrypter.getInstance();
 				String passw = e.encrypt(password);
-				preparedStatement = connect.prepareStatement("update tafeltrainer.begeleider set " + "password = '"
+				preparedStatement = connect.prepareStatement("update spelleritus.begeleider set " + "password = '"
 						+ passw + "' where email = '" + emailadress + "'");
 				i = preparedStatement.executeUpdate();
 			}
 		} catch (Exception e)
 		{
 			e.printStackTrace();
-		}
-		finally
+		} finally
 		{
-			if(connect != null)
+			if (connect != null)
 				try
 				{
 					connect.close();
@@ -135,12 +127,12 @@ public class MySQLAccess
 		try
 		{
 			connect = getConn();
-			preparedStatement = connect.prepareStatement("select * from tafeltrainer.begeleider"
+			preparedStatement = connect.prepareStatement("select * from spelleritus.begeleider"
 					+ " where verificationcode = '" + code + "'");
 			resultSet = preparedStatement.executeQuery();
 			if (resultSet.next())
 			{
-				preparedStatement = connect.prepareStatement("update tafeltrainer.begeleider "
+				preparedStatement = connect.prepareStatement("update spelleritus.begeleider "
 						+ " set verified = 1 where verificationcode = '" + code + "'");
 				int geslaagd = preparedStatement.executeUpdate();
 				if (geslaagd == 1)
@@ -151,10 +143,9 @@ public class MySQLAccess
 		} catch (Exception e)
 		{
 			e.printStackTrace();
-		}
-		finally
+		} finally
 		{
-			if(connect != null)
+			if (connect != null)
 				try
 				{
 					connect.close();
@@ -163,213 +154,8 @@ public class MySQLAccess
 					e.printStackTrace();
 				}
 		}
-		
+
 		return returnvalue;
-	}
-
-	public ArrayList<User> getHouindegatenUsers(SuperUser superuser)
-	{
-		ArrayList<User> users = new ArrayList<User>();
-		try
-		{
-			connect = getConn();
-			preparedStatement = connect.prepareStatement("select * from tafeltrainer.user where"
-					+ " emailsuperuser = '" + superuser.getEmail() + "'and houindegaten = 1");
-			resultSet = preparedStatement.executeQuery();
-			while (resultSet.next())
-			{
-				users.add(new User(resultSet.getInt("id"), resultSet.getString("emailsuperuser"), resultSet
-						.getString("name"), resultSet.getString("familyname"), resultSet.getString("groupname"),
-						resultSet.getString("loginname"), resultSet.getString("password"), resultSet.getInt("money"),
-						resultSet.getBoolean("houindegaten")));
-			}
-			preparedStatement.close();
-			resultSet.close();
-			connect.close();
-		} catch (SQLException e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			if(connect != null)
-				try
-				{
-					connect.close();
-				} catch (SQLException e)
-				{
-					e.printStackTrace();
-				}
-		}
-		return users;
-	}
-
-	public ArrayList<SessionSummary> getSessionDates(int userid)
-	{
-		ArrayList<SessionSummary> reports = new ArrayList<SessionSummary>();
-		connect = getConn();
-		try
-		{
-			preparedStatement = connect.prepareStatement("select summary,minutes, seconds,howmuchopgaven,howmucherrors"
-					+ " from tafeltrainer.sessie where userid = " + userid);
-			resultSet = preparedStatement.executeQuery();
-			while (resultSet.next())
-			{
-				reports.add(new SessionSummary(resultSet.getString("summary"), resultSet.getInt("howmuchopgaven"),
-						resultSet.getInt("howmucherrors"), resultSet.getInt("minutes"), resultSet.getInt("seconds")));
-			}
-			preparedStatement.close();
-			resultSet.close();
-			connect.close();
-
-		} catch (SQLException e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			if(connect != null)
-				try
-				{
-					connect.close();
-				} catch (SQLException e)
-				{
-					e.printStackTrace();
-				}
-		}
-		return reports;
-	}
-
-	public String getSessionDatesHtmlString(int userid)
-	{
-		String message = "<br>";
-		ArrayList<SessionSummary> reports = getSessionDates(userid);
-		User u = getUserById(userid);
-		message = message + "Laatst bekende oefendata: <br><br>";
-		ArrayList<String> dates = getdates(reports);
-		if (dates != null)
-		{
-			for (String date : dates)
-			{
-				int seconds = 0;
-				for (SessionSummary s : reports)
-				{
-					if (date.equals(s.sessiondate))
-					{
-						seconds += s.getMinutes() * 60 + s.getSeconds();
-					}
-				}
-				message = message + date + " " + seconds / 60 + " min " + seconds % 60 + " seconden<br>";
-			}
-		} else
-			message = message + "<i>Geen oefenmomenten bekend</i><br>";
-		return message + "<br><br><br>";
-	}
-
-	private ArrayList<String> getdates(ArrayList<SessionSummary> reports)
-	{
-		int maximum = 0;
-		ArrayList<String> returndates = new ArrayList<String>();
-		if (reports.size() == 0)
-		{
-			return null;
-		}
-		String newdate = reports.get((reports.size() - 1)).getSessiondate();
-		returndates.add(newdate);
-		if (reports.size() == 1)
-		{
-			return returndates;
-		}
-		for (int i = reports.size() - 1; i > 0; i--)
-		{
-			if (reports.get(i - 1).getSessiondate().equals(newdate))
-				newdate = reports.get(i - 1).getSessiondate();
-			else
-			{
-				newdate = reports.get(i - 1).getSessiondate();
-				returndates.add(newdate);
-				maximum++;
-				if (maximum == 2)
-				{
-					return returndates;
-				}
-			}
-		}
-		return returndates;
-	}
-
-	//TODO foutmelding nullpointerexception
-	public ArrayList<Product> getProducts(int userid)
-	{
-		connect = getConn();
-		ArrayList<Product> productlist = new ArrayList<Product>();
-		productlist.add(new Product());
-		try
-		{
-			preparedStatement = connect.prepareStatement("select * from tafeltrainer.product " + " where userid = "
-					+ userid);
-			resultSet = preparedStatement.executeQuery();
-			while (resultSet.next())
-			{
-				Product p = new Product(resultSet.getString("url"), resultSet.getString("message"),
-						resultSet.getString("productcatg"));
-				productlist.add(p);
-			}
-			productlist.remove(0);
-			preparedStatement.close();
-			resultSet.close();
-			connect.close();
-		} catch (SQLException e)
-		{
-			System.out.println("fout in getproducts");
-			e.printStackTrace();
-		}
-		finally
-		{
-			if(connect != null)
-				try
-				{
-					connect.close();
-				} catch (SQLException e)
-				{
-					e.printStackTrace();
-				}
-		}
-		return productlist;
-	}
-
-	public void addProduct(int userid, Product product)
-	{
-		connect = getConn();
-		try
-		{
-			preparedStatement = connect.prepareStatement("insert into tafeltrainer.product"
-					+ " (id, url, message, userid,productcatg) values (default,?,?,?,?)");
-			preparedStatement.setString(1, product.getUrl());
-			preparedStatement.setString(2, product.getMessage());
-			preparedStatement.setInt(3, userid);
-			preparedStatement.setString(4, String.valueOf(product.getProductcat()));
-			preparedStatement.executeUpdate();
-			preparedStatement.close();
-			resultSet.close();
-			connect.close();
-		} catch (SQLException e)
-		{
-			e.printStackTrace();
-			System.out.println("fout in addproduct");
-
-		}
-		finally
-		{
-			if(connect != null)
-				try
-				{
-					connect.close();
-				} catch (SQLException e)
-				{
-					e.printStackTrace();
-				}
-		}
 	}
 
 	public SuperUser retrieveSuperUser(String email, String password)
@@ -380,13 +166,16 @@ public class MySQLAccess
 		SuperUser resultuser = null;
 		try
 		{
-			preparedStatement = connect.prepareStatement("select * from tafeltrainer.begeleider where" + " password ='"
-					+ passw + "'and email ='" + email + "'");
+			preparedStatement = connect.prepareStatement("select * from spelleritus.begeleider where password =?"
+					+ "and email =?");
+			preparedStatement.setString(1, passw);
+			preparedStatement.setString(2, email);
 			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next())
 			{
 				resultuser = new SuperUser(resultSet.getString("name"), resultSet.getString("email"), password,
-						resultSet.getInt("emailfrequency"), resultSet.getBoolean("verified"));
+						resultSet.getInt("emailfrequency"), resultSet.getString("haspackages"),
+						resultSet.getBoolean("verified"));
 			}
 			preparedStatement.close();
 			resultSet.close();
@@ -396,10 +185,9 @@ public class MySQLAccess
 			e.printStackTrace();
 			System.out.println("fout in getuser of superuser onbekend");
 			return resultuser;
-		}
-		finally
+		} finally
 		{
-			if(connect != null)
+			if (connect != null)
 				try
 				{
 					connect.close();
@@ -411,19 +199,18 @@ public class MySQLAccess
 		return resultuser;
 	}
 
-	
 	public ArrayList<SuperUser> getSuperUserList()
 	{
 		connect = getConn();
 		ArrayList<SuperUser> resultusers = new ArrayList<SuperUser>();
 		try
 		{
-			preparedStatement = connect.prepareStatement("select * from tafeltrainer.begeleider");
+			preparedStatement = connect.prepareStatement("select * from spelleritus.begeleider");
 			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next())
 			{
-				resultusers.add(new SuperUser(resultSet.getString("name"), resultSet.getString("email"), resultSet.getString("password"),
-						resultSet.getInt("emailfrequency")));
+				resultusers.add(new SuperUser(resultSet.getString("name"), resultSet.getString("email"), resultSet
+						.getString("password"), resultSet.getInt("emailfrequency")));
 			}
 			preparedStatement.close();
 			resultSet.close();
@@ -433,10 +220,9 @@ public class MySQLAccess
 			e.printStackTrace();
 			System.out.println("fout in getuser of superuser onbekend");
 			return resultusers;
-		}
-		finally
+		} finally
 		{
-			if(connect != null)
+			if (connect != null)
 				try
 				{
 					connect.close();
@@ -447,15 +233,16 @@ public class MySQLAccess
 		}
 		return resultusers;
 	}
-	
+
 	public SuperUser addNewSuperUser(SuperUser superuser)
 	{
 		connect = getConn();
+		ArrayList<Woordpakket> woordpakketten = new ArrayList<Woordpakket>();
 		SuperUser resultuser = null;
 		try
 		{
-			preparedStatement = connect.prepareStatement("select * from tafeltrainer.begeleider where" + " email ='"
-					+ superuser.getEmail() + "'");
+			preparedStatement = connect.prepareStatement("select * from spelleritus.begeleider where email =?");
+			preparedStatement.setString(1, superuser.getEmail());
 			resultSet = preparedStatement.executeQuery();
 			resultSet.first();
 			if (resultSet.getRow() > 0)
@@ -471,15 +258,50 @@ public class MySQLAccess
 				resultuser = new SuperUser("Emailadres bestaat al", "Of nog niet geverifieerd");
 				return resultuser;
 			}
+			// TODO packages ophalen
+			preparedStatement = connect.prepareStatement("select * from spelleritus.woordpakketten where ismutable=0");
+			resultSet = preparedStatement.executeQuery();
+			while (resultSet.next())
+			{
+				Woordpakket wp = new Woordpakket(resultSet.getString("identifier"), resultSet.getString("description"),
+						resultSet.getString("contents"));
+				woordpakketten.add(wp);
+			}
+
+			preparedStatement = connect.prepareStatement("select id from spelleritus.woordpakketten");
+			resultSet = preparedStatement.executeQuery();
+			resultSet.last();
+			int lastitem = resultSet.getInt("id");
+			ArrayList<Integer> wpids = new ArrayList<Integer>();
+
+			for (Woordpakket w : woordpakketten)
+			{
+				wpids.add(lastitem);
+				lastitem++;
+				preparedStatement = connect
+						.prepareStatement("insert into spelleritus.woordpakketten (id,identifier,description,contents) values (?,?,?,?)");
+				preparedStatement.setInt(1, lastitem);
+				preparedStatement.setString(2, w.getIdentifier());
+				preparedStatement.setString(3, w.getDescription());
+				preparedStatement.setString(4, w.getContents());
+				preparedStatement.executeUpdate();
+			}
+			StringBuilder mywps = new StringBuilder("");
+			for (Integer i : wpids)
+			{
+				mywps.append(String.valueOf(i) + " ");
+			}
+
 			preparedStatement = connect
-					.prepareStatement("insert into tafeltrainer.begeleider "
-							+ "(id,name,email,password,emailfrequency,sendadress,verificationcode,verified) values (default,?,?,?,?,?,?,default)");
+					.prepareStatement("insert into spelleritus.begeleider "
+							+ "(id,name,email,password,emailfrequency,verificationcode,haspackages,verified,sendadress) values (default,?,?,?,?,?,?,default,?)");
 			preparedStatement.setString(1, superuser.getName());
 			preparedStatement.setString(2, superuser.getEmail());
 			preparedStatement.setString(3, superuser.getPassword());
 			preparedStatement.setInt(4, superuser.getEmailfrequency());
-			preparedStatement.setString(5, superuser.getEmail());
-			preparedStatement.setString(6, superuser.getVerificationcode());
+			preparedStatement.setString(5, superuser.getVerificationcode());
+			preparedStatement.setString(6, mywps.toString());
+			preparedStatement.setString(7, superuser.getSendaddress());
 			preparedStatement.executeUpdate();
 			preparedStatement.close();
 			connect.close();
@@ -488,10 +310,9 @@ public class MySQLAccess
 		{
 			e.printStackTrace();
 			System.out.println("fout in addnew superuser...");
-		}
-		finally
+		} finally
 		{
-			if(connect != null)
+			if (connect != null)
 				try
 				{
 					connect.close();
@@ -511,7 +332,7 @@ public class MySQLAccess
 		{
 			int howmuchopgaven = 0;
 			int errors = 0;
-			preparedStatement = connect.prepareStatement("select howmuchopgaven,howmucherrors from tafeltrainer.sessie"
+			preparedStatement = connect.prepareStatement("select howmuchopgaven,howmucherrors from spelleritus.sessie"
 					+ " where userid =" + id);
 			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next())
@@ -527,7 +348,7 @@ public class MySQLAccess
 			}
 			double averagespeed = 0;
 
-			preparedStatement = connect.prepareStatement("select howmuchopgaven,averagespeed from tafeltrainer.sessie"
+			preparedStatement = connect.prepareStatement("select howmuchopgaven,averagespeed from spelleritus.sessie"
 					+ " where userid = " + id);
 			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next())
@@ -538,7 +359,7 @@ public class MySQLAccess
 			preparedStatement.clearParameters();
 
 			preparedStatement = connect
-					.prepareStatement("update tafeltrainer.summaryres set howmuchopgaven = ?,accuracy = ?,"
+					.prepareStatement("update spelleritus.summaryres set howmuchopgaven = ?,accuracy = ?,"
 							+ " speed = ? where userid = " + id);
 			preparedStatement.setInt(1, howmuchopgaven);
 			preparedStatement.setDouble(2, percentage);
@@ -551,10 +372,9 @@ public class MySQLAccess
 			e.printStackTrace();
 			System.out.println("updateusermetadata");
 
-		}
-		finally
+		} finally
 		{
-			if(connect != null)
+			if (connect != null)
 				try
 				{
 					connect.close();
@@ -565,6 +385,57 @@ public class MySQLAccess
 		}
 	}
 
+	public ArrayList<Woordpakket> retrieveWps(SuperUser superuser)
+	{
+		connect = getConn();
+		ArrayList<Woordpakket> woordpakketten = new ArrayList<Woordpakket>();
+		Woordpakket resultWoordpakket = null;
+		woordpakketten.add(resultWoordpakket);
+		try
+		{
+			ArrayList<Integer> wpnumbers = new ArrayList<Integer>();
+
+			String[] wpnhelper = superuser.getPackages().split("[\\s+,\\s+]");
+			for (String s : wpnhelper)
+			{
+				wpnumbers.add(Integer.parseInt(s));
+			}
+			for (Integer number : wpnumbers)
+			{
+				preparedStatement = connect.prepareStatement("select * from spelleritus.woordpakketten where id=?");
+				preparedStatement.setInt(1, number);
+				resultSet = preparedStatement.executeQuery();
+				while (resultSet.next())
+				{
+					resultWoordpakket = new Woordpakket((long) resultSet.getInt("id"),
+							resultSet.getString("identifier"), resultSet.getString("description"),
+							resultSet.getString("contents"));
+					woordpakketten.add(resultWoordpakket);
+				}
+			}
+			woordpakketten.remove(0);
+			preparedStatement.close();
+			resultSet.close();
+			connect.close();
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+			System.out.println("fout in getgroup");
+		} finally
+		{
+			if (connect != null)
+				try
+				{
+					connect.close();
+				} catch (SQLException e)
+				{
+					e.printStackTrace();
+				}
+		}
+		return woordpakketten;
+
+	}
+
 	public ArrayList<User> getGroup(SuperUser superuser)
 	{
 		connect = getConn();
@@ -573,16 +444,16 @@ public class MySQLAccess
 		users.add(resultuser);
 		try
 		{
-			preparedStatement = connect.prepareStatement("select * from tafeltrainer.user where" + " emailsuperuser='"
-					+ superuser.getEmail() + "'");
+			preparedStatement = connect.prepareStatement("select * from spelleritus.user where emailsuperuser=?");
+			preparedStatement.setString(1, superuser.getEmail());
 			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next())
 			{
 				resultuser = new User(resultSet.getInt("id"), resultSet.getString("emailsuperuser"),
 						resultSet.getString("name"), resultSet.getString("familyname"),
-						resultSet.getString("groupname"), resultSet.getString("loginname"),
-						resultSet.getString("password"), resultSet.getInt("money"),
-						resultSet.getBoolean("houindegaten"));
+						resultSet.getString("loginname"), resultSet.getString("password"),
+						resultSet.getBoolean("houindegaten"), resultSet.getInt("currentpackage"),
+						resultSet.getInt("extrapackage"));
 				users.add(resultuser);
 			}
 			users.remove(0);
@@ -593,10 +464,9 @@ public class MySQLAccess
 		{
 			e.printStackTrace();
 			System.out.println("fout in getgroup");
-		}
-		finally
+		} finally
 		{
-			if(connect != null)
+			if (connect != null)
 				try
 				{
 					connect.close();
@@ -608,35 +478,23 @@ public class MySQLAccess
 		return users;
 	}
 
+	// deletes a user and the accompanying records
 	public void deleteUser(User user)
 	{
 		connect = getConn();
 		try
 		{
-			preparedStatement = connect.prepareStatement("delete from tafeltrainer.sessie" + " where userid ="
-					+ user.getId());
-			preparedStatement.executeUpdate();
-			preparedStatement = connect.prepareStatement("delete from tafeltrainer.opgave" + " where userid ="
-					+ user.getId());
-			preparedStatement.executeUpdate();
-			preparedStatement = connect.prepareStatement("delete from tafeltrainer.product" + " where userid ="
-					+ user.getId());
-			preparedStatement.executeUpdate();
-			preparedStatement = connect.prepareStatement(" delete from tafeltrainer.summaryres" + " where id="
-					+ user.getId());
-			preparedStatement.executeUpdate();
-			preparedStatement = connect
-					.prepareStatement(" delete from tafeltrainer.user" + " where id=" + user.getId());
+			preparedStatement = connect.prepareStatement(" delete from spelleritus.user where id=?");
+			preparedStatement.setInt(1, user.getId());
 			preparedStatement.executeUpdate();
 			preparedStatement.close();
 			connect.close();
 		} catch (Exception e)
 		{
 			e.printStackTrace();
-		}
-		finally
+		} finally
 		{
-			if(connect != null)
+			if (connect != null)
 				try
 				{
 					connect.close();
@@ -654,7 +512,7 @@ public class MySQLAccess
 		connect = getConn();
 		try
 		{
-			preparedStatement = connect.prepareStatement("select * from tafeltrainer.user" + " where loginname='"
+			preparedStatement = connect.prepareStatement("select * from spelleritus.user" + " where loginname='"
 					+ user.getLoginname() + "'and password='" + user.getPassword() + "'");
 			resultSet = preparedStatement.executeQuery();
 			if (resultSet.getRow() != 0)
@@ -665,21 +523,21 @@ public class MySQLAccess
 			}
 			resultSet.close();
 
-			preparedStatement = connect.prepareStatement("insert into tafeltrainer.user"
-					+ "(id,emailsuperuser,name,familyname,groupname,loginname,password,money,houindegaten)"
+			preparedStatement = connect.prepareStatement("insert into spelleritus.user"
+					+ "(id,emailsuperuser,name,familyname,loginname,password,houindegaten,currentpackage,extrapackage)"
 					+ "values (default,?,?,?,?,?,?,?,?)");
 			preparedStatement.setString(1, user.getEmailsuperuser());
 			preparedStatement.setString(2, user.getName());
 			preparedStatement.setString(3, user.getFamilyname());
-			preparedStatement.setString(4, user.getGroupname());
-			preparedStatement.setString(5, user.getLoginname());
-			preparedStatement.setString(6, user.getPassword());
-			preparedStatement.setInt(7, user.getMoney());
-			preparedStatement.setBoolean(8, user.getHouindegaten());
+			preparedStatement.setString(4, user.getLoginname());
+			preparedStatement.setString(5, user.getPassword());
+			preparedStatement.setBoolean(6, user.getHouindegaten());
+			preparedStatement.setInt(7, user.getCurrentwp());
+			preparedStatement.setInt(8, user.getExtrawp());
 			preparedStatement.executeUpdate();
 
-			preparedStatement = connect.prepareStatement("select * from tafeltrainer.user where id = "
-					+ " all(select max(id)from tafeltrainer.user)");
+			preparedStatement = connect.prepareStatement("select * from spelleritus.user where id = "
+					+ " all(select max(id)from spelleritus.user)");
 			resultSet = preparedStatement.executeQuery();
 			resultSet.next();
 			lastrow = resultSet.getInt("id");
@@ -687,28 +545,13 @@ public class MySQLAccess
 			resultSet.close();
 			connect.close();
 
-			connect = getConn();
-			preparedStatement = connect.prepareStatement("insert into tafeltrainer.summaryres (id,username,familyname"
-					+ " ,howmuchopgaven,accuracy,speed,emailsuperuser,userid) values (default,?,?,?,?,?,?,?)");
-			preparedStatement.setString(1, user.getName());
-			preparedStatement.setString(2, user.getFamilyname());
-			preparedStatement.setInt(3, 0);
-			preparedStatement.setDouble(4, 0.0);
-			preparedStatement.setDouble(5, 0.0);
-			preparedStatement.setString(6, user.getEmailsuperuser());
-			preparedStatement.setInt(7, lastrow);
-			preparedStatement.executeUpdate();
-			preparedStatement.close();
-			resultSet.close();
-			connect.close();
 		} catch (Exception e)
 		{
 			e.printStackTrace();
 			System.out.println("fout in addNewUser");
-		}
-		finally
+		} finally
 		{
-			if(connect != null)
+			if (connect != null)
 				try
 				{
 					connect.close();
@@ -717,285 +560,69 @@ public class MySQLAccess
 					e.printStackTrace();
 				}
 		}
-		return new User(lastrow, user.getEmailsuperuser(), user.getName(), user.getFamilyname(), user.getGroupname(),
-				user.getLoginname(), user.getPassword(), 0, user.getHouindegaten());
+		return new User(lastrow, user.getEmailsuperuser(), user.getName(), user.getFamilyname(), user.getLoginname(),
+				user.getPassword(), user.getHouindegaten(), user.getCurrentwp(), user.getExtrawp());
 	}
 
-	public ArrayList<UserResults> getMetaData(SuperUser superuser)
+	public boolean updateWoordpakket(Woordpakket wp, SuperUser su)
 	{
-		ArrayList<UserResults> userresults = new ArrayList<UserResults>();
+		boolean result = false;
 		connect = getConn();
 		try
 		{
-			preparedStatement = connect.prepareStatement("select * from tafeltrainer.summaryres"
-					+ " where emailsuperuser = '" + superuser.getEmail() + "'");
+			preparedStatement = connect
+					.prepareStatement("select identifier from spelleritus.woordpakketten where identifier=?");
+			preparedStatement.setString(1, wp.getIdentifier());
 			resultSet = preparedStatement.executeQuery();
-			UserResults dummy = new UserResults();
-			dummy = null;
-			userresults.add(dummy);
-
-			while (resultSet.next())
+			if (resultSet.next())
 			{
-				UserResults ur = new UserResults(resultSet.getInt("userid"), resultSet.getString("username"),
-						resultSet.getString("familyname"), resultSet.getDouble("accuracy"),
-						resultSet.getInt("howmuchopgaven"), resultSet.getDouble("speed"));
-				userresults.add(ur);
-			}
-			userresults.remove(0);
-			preparedStatement.close();
-			resultSet.close();
-			connect.close();
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		finally
-		{
-			if(connect != null)
-				try
-				{
-					connect.close();
-				} catch (SQLException e)
-				{
-					e.printStackTrace();
-				}
-		}
-		return userresults;
-	}
-
-	/**
-	 * berekent het foutpercentage voor een bepaalde tafel en retourneert het
-	 * tafelresultaat-object
-	 * 
-	 * @param id
-	 */
-	public TafelResult getTafelResults_1(int id, int factor)
-	{
-		TafelResult tr = new TafelResult();
-		try
-		{
-			int score = 0;
-			int aantalopgaven = 0;
-			connect = getConn();
-
-			preparedStatement = connect.prepareStatement("select factor2,iscorrect,userid from tafeltrainer.opgave "
-					+ " where factor2 =" + factor + " and userid =" + id);
-			resultSet = preparedStatement.executeQuery();
-			while (resultSet.next())
-			{
-				if (resultSet.getBoolean("iscorrect"))
-				{
-					score++;
-				}
-				aantalopgaven++;
-			}
-			// preparedStatement.clearParameters();
-			double percentage = 0;
-			if (aantalopgaven > 0)
-			{
-				percentage = ((double) score * 100) / (double) aantalopgaven;
-				tr = new TafelResult(factor, (int) percentage, aantalopgaven);
+				preparedStatement = connect.prepareStatement("update spelleritus.woordpakketten "
+						+ "set identifier=?, description=?, contents=?" + "where id=? ");
+				preparedStatement.setString(1, wp.getIdentifier());
+				preparedStatement.setString(2, wp.getDescription());
+				preparedStatement.setString(3, wp.getContents());
+				preparedStatement.setInt(4, wp.getId().intValue());
+				preparedStatement.executeUpdate();
+				preparedStatement.close();
 			} else
 			{
-				tr = new TafelResult(factor, 0, 0);
-			}
-			// preparedStatement.close();
-			connect.close();
-		} catch (Exception e)
-		{
-			System.out.println("fout in gettafelresults_1");
-			e.printStackTrace();
-		}
-		finally
-		{
-			if(connect != null)
-				try
-				{
-					connect.close();
-				} catch (SQLException e)
-				{
-					e.printStackTrace();
-				}
-		}
-
-		return tr;
-	}
-
-	/**
-	 * berekent het foutpercentage voor een bepaalde tafel, en stopt de
-	 * resultaten per tafeltype in een ArrayList
-	 * 
-	 * @param id
-	 */
-	public ArrayList<TafelResult> getTafelResults(int id)
-	{
-		connect = getConn();
-		ArrayList<TafelResult> tafelresultaten = new ArrayList<TafelResult>();
-		try
-		{
-
-			int factor = 0;
-			for (factor = 2; factor < 20; factor++)
-			{
-				int score = 0;
-				int aantalopgaven = 0;
 				preparedStatement = connect
-						.prepareStatement("select factor2,iscorrect,userid from tafeltrainer.opgave "
-								+ " where factor2 =" + factor + " and userid =" + id);
-				resultSet = preparedStatement.executeQuery();
-				while (resultSet.next())
+						.prepareStatement("insert into spelleritus.woordpakketten (id,identifier,description,contents) values (default,?,?,?,default)");
+				preparedStatement.setString(1, wp.getIdentifier());
+				preparedStatement.setString(2, wp.getDescription());
+				preparedStatement.setString(3, wp.getContents());
+				preparedStatement.executeUpdate();
+				preparedStatement = connect.prepareStatement("select * from spelleritus.woordpakketten");
+				resultSet =  preparedStatement.executeQuery();
+				resultSet.last();
+				int newid = -1;
+				newid = resultSet.getInt("id");
+				if(newid>0)
 				{
-					if (resultSet.getBoolean("iscorrect"))
-					{
-						score++;
-					}
-					aantalopgaven++;
+					preparedStatement = connect.prepareStatement("select * from spelleritus.begeleider where email=?");
+					preparedStatement.setString(1, su.getEmail());
+					resultSet = preparedStatement.executeQuery();
+					resultSet.first();
+					StringBuilder str = new StringBuilder(resultSet.getString("haspackages"));
+					str.append(" " + String.valueOf(newid));
+					preparedStatement = connect.prepareStatement("update from spelleritus.begeleider set haspackages = ? where email=?");
+					preparedStatement.setString(1, str.toString());
+					preparedStatement.setString(2, su.getEmail());
+					preparedStatement.executeUpdate();
 				}
-				preparedStatement.clearParameters();
-				double percentage = 0;
-				if (aantalopgaven > 0)
-				{
-					percentage = ((double) score * 100) / (double) aantalopgaven;
-					TafelResult tr = new TafelResult(factor, (int) percentage, aantalopgaven);
-					tafelresultaten.add(tr);
-				} else
-				{
-					TafelResult tr = new TafelResult(factor, (int) percentage, aantalopgaven);
-					tafelresultaten.add(tr);
-				}
+				
+
 			}
-			preparedStatement.close();
-			resultSet.close();
-			connect.close();
+
 		}
 
 		catch (Exception e)
 		{
-			System.out.println("fout in gettafelresults");
 			e.printStackTrace();
-		}
-		finally
+			return result = false;
+		} finally
 		{
-			if(connect != null)
-				try
-				{
-					connect.close();
-				} catch (SQLException e)
-				{
-					e.printStackTrace();
-				}
-		}
-		return tafelresultaten;
-	}
-
-	/**
-	 * Berekent het aantal fouten
-	 * 
-	 * @param id
-	 */
-	public int getErrors(int id)
-	{
-		connect = getConn();
-		int errors = 0;
-		try
-		{
-			preparedStatement = connect.prepareStatement("select howmucherrors from tafeltrainer.sessie"
-					+ " where userid =" + id);
-			resultSet = preparedStatement.executeQuery();
-			while (resultSet.next())
-			{
-				errors += resultSet.getInt("howmucherrors");
-			}
-			preparedStatement.close();
-			resultSet.close();
-			connect.close();
-		} catch (Exception e)
-		{
-			System.out.println("fout in geterrors");
-			e.printStackTrace();
-		}
-		finally
-		{
-			if(connect != null)
-				try
-				{
-					connect.close();
-				} catch (SQLException e)
-				{
-					e.printStackTrace();
-				}
-		}
-		return errors;
-	}
-
-	/**
-	 * Berekent de gemiddelde snelheid over alle sessies.
-	 * 
-	 * @param id
-	 */
-	public double getAverageSpeed(int totalopgaven, int id)
-	{
-		connect = getConn();
-		double averagespeed = 0;
-		try
-		{
-			preparedStatement = connect.prepareStatement("select howmuchopgaven,averagespeed from tafeltrainer.sessie"
-					+ " where userid = " + id);
-			resultSet = preparedStatement.executeQuery();
-			while (resultSet.next())
-			{
-				averagespeed += (resultSet.getDouble("averagespeed") * ((double) resultSet.getInt("howmuchopgaven") / (double) totalopgaven));
-			}
-			preparedStatement.close();
-			resultSet.close();
-			connect.close();
-
-		} catch (Exception e)
-		{
-			System.out.println("foutje in getaveragespeed");
-		}
-		finally
-		{
-			if(connect != null)
-				try
-				{
-					connect.close();
-				} catch (SQLException e)
-				{
-					e.printStackTrace();
-				}
-		}
-		return averagespeed;
-	}
-
-	/**
-	 * Telt van alle sessies de totale hoeveelheid opgaven bij elkaar op
-	 * 
-	 * @param id
-	 * 
-	 */
-	public int getHowMuchOpgaven(int id)
-	{
-		connect = getConn();
-		int result = 0;
-		try
-		{
-			preparedStatement = connect.prepareStatement("select * from tafeltrainer.sessie" + " where userid =" + id);
-			resultSet = preparedStatement.executeQuery();
-			while (resultSet.next())
-			{
-				result = result + resultSet.getInt("howmuchopgaven");
-			}
-			preparedStatement.close();
-			resultSet.close();
-			connect.close();
-		} catch (SQLException s)
-		{
-			System.out.println("ergens iets fout...in howmuchopgaven");
-		}
-		finally
-		{
-			if(connect != null)
+			if (connect != null)
 				try
 				{
 					connect.close();
@@ -1024,7 +651,7 @@ public class MySQLAccess
 			 */
 			if (superuser.getEmail() != oldemail)
 			{
-				preparedStatement = connect.prepareStatement("select email from tafeltrainer.begeleider ");
+				preparedStatement = connect.prepareStatement("select email from spelleritus.begeleider ");
 				resultSet = preparedStatement.executeQuery();
 				while (resultSet.next())
 				{
@@ -1033,19 +660,19 @@ public class MySQLAccess
 						return;
 					}
 				}
-				preparedStatement = connect.prepareStatement("update tafeltrainer.user set"
+				preparedStatement = connect.prepareStatement("update spelleritus.user set"
 						+ " emailsuperuser = ? where emailsuperuser = '" + oldemail + "'");
 				preparedStatement.setString(1, superuser.getEmail());
 				preparedStatement.executeUpdate();
 				preparedStatement.close();
-				preparedStatement = connect.prepareStatement("update tafeltrainer.summaryres"
+				preparedStatement = connect.prepareStatement("update spelleritus.summaryres"
 						+ " set emailsuperuser = ? where emailsuperuser ='" + oldemail + "'");
 				preparedStatement.setString(1, superuser.getEmail());
 				preparedStatement.executeUpdate();
 				preparedStatement.close();
 			}
 			preparedStatement = connect
-					.prepareStatement("update tafeltrainer.begeleider set "
+					.prepareStatement("update spelleritus.begeleider set "
 							+ " name = ? , email = ?, password = ? , emailfrequency = ?  " + "where email = '"
 							+ oldemail + "'");
 			preparedStatement.setString(1, superuser.getName());
@@ -1061,10 +688,9 @@ public class MySQLAccess
 		{
 			System.out.println("fout in updatesuperuser");
 			e.printStackTrace();
-		}
-		finally
+		} finally
 		{
-			if(connect != null)
+			if (connect != null)
 				try
 				{
 					connect.close();
@@ -1084,28 +710,28 @@ public class MySQLAccess
 		connect = getConn();
 		try
 		{
-			preparedStatement = connect.prepareStatement("update tafeltrainer.user set emailsuperuser=?,name=?,"
-					+ "familyname=? ,groupname=? ,loginname=? ,money=?,houindegaten=? where id = " + user.getId());
+			preparedStatement = connect.prepareStatement("update spelleritus.user set emailsuperuser=?,name=?,"
+					+ "familyname=?  ,loginname=?  ,password=? ,houindegaten=? "
+					+ ",currentpackage=? ,extrapackage=? where id =?");
 			preparedStatement.setString(1, user.getEmailsuperuser());
 			preparedStatement.setString(2, user.getName());
 			preparedStatement.setString(3, user.getFamilyname());
-			preparedStatement.setString(4, user.getGroupname());
-			preparedStatement.setString(5, user.getLoginname());
-			preparedStatement.setInt(6, user.getMoney());
-			preparedStatement.setBoolean(7, user.getHouindegaten());
+			preparedStatement.setString(4, user.getLoginname());
+			preparedStatement.setString(5, user.getPassword());
+			preparedStatement.setBoolean(6, user.getHouindegaten());
+			preparedStatement.setInt(7, user.getCurrentwp());
+			preparedStatement.setInt(8, user.getExtrawp());
+			preparedStatement.setInt(9, user.getId());
 			preparedStatement.executeUpdate();
 			preparedStatement.close();
 			connect.close();
-		}
-
-		catch (Exception e)
+		} catch (Exception e)
 		{
 			System.out.println("fout in updateuser");
 			e.printStackTrace();
-		}
-		finally
+		} finally
 		{
-			if(connect != null)
+			if (connect != null)
 				try
 				{
 					connect.close();
@@ -1122,7 +748,7 @@ public class MySQLAccess
 
 		try
 		{
-			preparedStatement = connect.prepareStatement("update tafeltrainer.user set emailsuperuser=?,name=?,"
+			preparedStatement = connect.prepareStatement("update spelleritus.user set emailsuperuser=?,name=?,"
 					+ "familyname=? ,groupname=? ,loginname=? ,money=?,houindegaten=? where id = " + user.getId());
 			preparedStatement.setString(1, user.getEmailsuperuser());
 			preparedStatement.setString(2, user.getName());
@@ -1135,7 +761,7 @@ public class MySQLAccess
 			preparedStatement.close();
 			connect.close();
 			connect = getConn();
-			preparedStatement = connect.prepareStatement("update tafeltrainer.summaryres set"
+			preparedStatement = connect.prepareStatement("update spelleritus.summaryres set"
 					+ " username = ?,familyname = ? where userid =" + user.getId());
 			preparedStatement.setString(1, user.getName());
 			preparedStatement.setString(2, user.getFamilyname());
@@ -1147,202 +773,9 @@ public class MySQLAccess
 		{
 			System.out.println("fout in administratorUpdatesUser");
 			e.printStackTrace();
-		}
-		finally
+		} finally
 		{
-			if(connect != null)
-				try
-				{
-					connect.close();
-				} catch (SQLException e)
-				{
-					e.printStackTrace();
-				}
-		}
-	}
-
-	public void writeOpgave(Opgave opgave, int userid)
-	{
-		connect = getConn();
-		try
-		{
-			preparedStatement = connect.prepareStatement("insert into tafeltrainer.opgave (id, factor1, factor2, "
-					+ "antwoord, useranswer,iscorrect, time,userid) values (default,?,?,?,?,?,?,?)");
-			preparedStatement.setInt(1, opgave.getFactor1());
-			preparedStatement.setInt(2, opgave.getFactor2());
-			preparedStatement.setInt(3, opgave.getAntwoord());
-			preparedStatement.setInt(4, opgave.getUseranswer());
-			preparedStatement.setBoolean(5, opgave.iscorrect);
-			preparedStatement.setDouble(6, opgave.getTime());
-			preparedStatement.setInt(7, userid);
-			preparedStatement.executeUpdate();
-			preparedStatement.close();
-			connect.close();
-
-		}
-
-		catch (Exception e)
-		{
-			System.out.println("fout in writeopgave");
-			e.printStackTrace();
-		}
-		finally
-		{
-			if(connect != null)
-				try
-				{
-					connect.close();
-				} catch (SQLException e)
-				{
-					e.printStackTrace();
-				}
-		}
-
-	}
-
-	public SessionSummary retrieveSession(int userid)
-	{
-		SessionSummary session = new SessionSummary();
-		connect = getConn();
-		try
-		{
-			Timestamp begindatum = null;
-			String oefentijd = "";
-			int hours = 0;
-			int minutes = 0;
-			int seconds = 0;
-			int result = 0;
-			int errors = 0;
-			double averagespeed = 0;
-			preparedStatement = connect.prepareStatement("select * from tafeltrainer.sessie" + " where userid ="
-					+ userid);
-			resultSet = preparedStatement.executeQuery();
-			resultSet.first();
-			if (resultSet.getRow() > 0)
-			{
-				while (resultSet.next())
-				{
-					result = result + resultSet.getInt("howmuchopgaven");
-				}
-				resultSet.beforeFirst();
-				while (resultSet.next())
-				{
-					hours += resultSet.getInt("hours");
-					minutes += resultSet.getInt("minutes");
-					seconds += resultSet.getInt("seconds");
-					errors += resultSet.getInt("howmucherrors");
-					averagespeed += (resultSet.getDouble("averagespeed") * ((double) resultSet.getInt("howmuchopgaven") / (double) result));
-				}
-
-				resultSet.first();
-				begindatum = resultSet.getTimestamp("starttijd");
-				session.setTimestamp(begindatum);
-				minutes += seconds / 60;
-				seconds = seconds % 60;
-				hours += minutes / 60;
-				minutes = minutes % 60;
-				oefentijd = String.valueOf(hours) + " uur," + String.valueOf(minutes) + " minuten";
-				session.setSessionLength(oefentijd);
-				session.setHowMuchOpgaven((double) result);
-				session.setErrors(errors);
-				session.setAverageSpeed(averagespeed);
-			}
-
-			preparedStatement.close();
-			resultSet.close();
-			connect.close();
-		} catch (Exception e)
-		{
-			System.out.println("fout in retrieve session");
-			e.printStackTrace();
-		}
-		finally
-		{
-			if(connect != null)
-				try
-				{
-					connect.close();
-				} catch (SQLException e)
-				{
-					e.printStackTrace();
-				}
-		}
-		return session;
-	}
-
-	public void writeSession(SessionSummary session, int userid)
-	{
-		connect = getConn();
-
-		if (flag == 0)
-			try
-			{
-				preparedStatement = connect
-						.prepareStatement("insert into tafeltrainer.sessie (id,starttijd,summary,hours,"
-								+ "minutes,seconds,howmuchopgaven,howmucherrors,accuracy,averagespeed,userid)	 "
-								+ "values (default,?,?,?,?,?,?,?,?,?,?)");
-				preparedStatement.setTimestamp(1, session.timestamp);
-				preparedStatement.setString(2, session.toString());
-				preparedStatement.setInt(3, session.hours);
-				preparedStatement.setInt(4, session.minutes);
-				preparedStatement.setInt(5, session.seconds);
-				preparedStatement.setInt(6, (int) session.howMuchOpgaven);
-				preparedStatement.setInt(7, (int) session.fouten);
-				preparedStatement.setDouble(8, session.accuracy);
-				preparedStatement.setDouble(9, session.averageSpeed);
-				preparedStatement.setInt(10, userid);
-				preparedStatement.executeUpdate();
-				flag = 1;
-				preparedStatement.close();
-				connect.close();
-				return;
-
-			}
-			catch (Exception e)
-			{
-				System.out.println("fout in writesession");
-				e.printStackTrace();
-			}
-		finally
-		{
-			if(connect != null)
-				try
-				{
-					connect.close();
-				} catch (SQLException e)
-				{
-					e.printStackTrace();
-				}
-		}
-
-		if (flag == 1)
-			try
-			{
-				preparedStatement = connect
-						.prepareStatement("update tafeltrainer.sessie set summary = ?,hours = ?, minutes = ?,"
-								+ "seconds = ?, howmuchopgaven = ?, howmucherrors = ?, accuracy = ?,"
-								+ "averagespeed = ?" + "order by id desc limit 1");
-				preparedStatement.setString(1, session.toString());
-				preparedStatement.setInt(2, session.hours);
-				preparedStatement.setInt(3, session.minutes);
-				preparedStatement.setInt(4, session.seconds);
-				preparedStatement.setInt(5, (int) session.howMuchOpgaven);
-				preparedStatement.setInt(6, (int) session.fouten);
-				preparedStatement.setDouble(7, session.accuracy);
-				preparedStatement.setDouble(8, session.averageSpeed);
-				preparedStatement.executeUpdate();
-				preparedStatement.close();
-				connect.close();
-			}
-
-			catch (Exception e)
-			{
-				System.out.println("fout in writesession");
-				e.printStackTrace();
-			}
-		finally
-		{
-			if(connect != null)
+			if (connect != null)
 				try
 				{
 					connect.close();
@@ -1359,15 +792,14 @@ public class MySQLAccess
 		User resultuser = null;
 		try
 		{
-			preparedStatement = connect.prepareStatement("select * from tafeltrainer.user where" + " loginname='"
+			preparedStatement = connect.prepareStatement("select * from spelleritus.user where" + " loginname='"
 					+ loginname + "'and password='" + password + "'");
 			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next())
 			{
 				resultuser = new User(resultSet.getInt("id"), resultSet.getString("emailsuperuser"),
 						resultSet.getString("name"), resultSet.getString("familyname"),
-						resultSet.getString("groupname"), resultSet.getString("loginname"),
-						resultSet.getString("password"), resultSet.getInt("money"),
+						resultSet.getString("loginname"), resultSet.getString("password"),
 						resultSet.getBoolean("houindegaten"));
 			}
 			preparedStatement.close();
@@ -1377,10 +809,9 @@ public class MySQLAccess
 		{
 			System.out.println("fout in getuser of user onbekend");
 			return resultuser;
-		}
-		finally
+		} finally
 		{
-			if(connect != null)
+			if (connect != null)
 				try
 				{
 					connect.close();
@@ -1389,7 +820,7 @@ public class MySQLAccess
 					e.printStackTrace();
 				}
 		}
-		
+
 		return resultuser;
 	}
 
@@ -1399,14 +830,13 @@ public class MySQLAccess
 		User resultuser = null;
 		try
 		{
-			preparedStatement = connect.prepareStatement("select * from tafeltrainer.user where" + " id =" + id);
+			preparedStatement = connect.prepareStatement("select * from spelleritus.user where" + " id =" + id);
 			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next())
 			{
 				resultuser = new User(resultSet.getInt("id"), resultSet.getString("emailsuperuser"),
 						resultSet.getString("name"), resultSet.getString("familyname"),
-						resultSet.getString("groupname"), resultSet.getString("loginname"),
-						resultSet.getString("password"), resultSet.getInt("money"),
+						resultSet.getString("loginname"), resultSet.getString("password"),
 						resultSet.getBoolean("houindegaten"));
 			}
 			preparedStatement.close();
@@ -1416,10 +846,9 @@ public class MySQLAccess
 		{
 			System.out.println("fout in getuserById of user onbekend");
 			return resultuser;
-		}
-		finally
+		} finally
 		{
-			if(connect != null)
+			if (connect != null)
 				try
 				{
 					connect.close();

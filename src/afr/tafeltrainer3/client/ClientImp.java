@@ -1,13 +1,11 @@
 package afr.tafeltrainer3.client;
 
 import afr.tafeltrainer3.client.events.DataEvent;
-import afr.tafeltrainer3.shared.FeedbackContainer;
-import afr.tafeltrainer3.shared.Product;
 import afr.tafeltrainer3.shared.SimpleService;
 import afr.tafeltrainer3.shared.SimpleServiceAsync;
-import afr.tafeltrainer3.shared.Opgave;
 import afr.tafeltrainer3.shared.SuperUser;
 import afr.tafeltrainer3.shared.User;
+import afr.tafeltrainer3.shared.Woordpakket;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -19,7 +17,6 @@ public class ClientImp extends Composite implements ClientImpInterface
 
 	private SimpleServiceAsync service;
 	private MainView main;
-	private Tafeltrainer3Gui gui;
 
 	public ClientImp()
 	{
@@ -54,18 +51,7 @@ public class ClientImp extends Composite implements ClientImpInterface
 		this.service.verifyMailadress(parameter, new DefaultCallBack());
 	}
 
-	@Override
-	public void getSuperuserFeedback(int id)
-	{
-		this.service.getSuperuserFeedback(id, new DefaultCallBack());
-	}
-
-	@Override
-	public void getUserFeedback(int id)
-	{
-		this.service.getUserFeedback(id, new DefaultCallBack());
-	}
-
+	
 	@Override
 	public void sendMail(SuperUser superuser)
 	{
@@ -82,26 +68,6 @@ public class ClientImp extends Composite implements ClientImpInterface
 	public void updateSuperUser(SuperUser superuser, String oldemail)
 	{
 		this.service.updateSuperUser(superuser, oldemail, new DefaultCallBack());
-	}
-
-	@Override
-	public void getProducts(int userid)
-	{
-		if (userid != 1)
-			this.service.getProducts(userid, new DefaultCallBack());
-	}
-
-	@Override
-	public void addProduct(int userid, Product product)
-	{
-		if (userid != 1)
-			this.service.addProduct(userid, product, new DefaultCallBack());
-	}
-
-	@Override
-	public void getGroupResults(SuperUser superuser)
-	{
-		this.service.getGroupResults(superuser, new DefaultCallBack());
 	}
 
 	@Override
@@ -140,12 +106,7 @@ public class ClientImp extends Composite implements ClientImpInterface
 		this.service.retrieveUser(loginname, passw, new DefaultCallBack());
 	}
 
-	@Override
-	public void getFeedbackData(int id)
-	{
-		this.service.getFeedbackData(id, new DefaultCallBack());
-	}
-
+	
 	// haalt de user uit de database
 	@Override
 	public void getUser(String loginname, String passw)
@@ -153,45 +114,28 @@ public class ClientImp extends Composite implements ClientImpInterface
 		this.service.getUser(loginname, passw, new DefaultCallBack());
 	}
 
-	// houdt de user die bezig is bij in de database door geldtoename of afname
-	// te registreren.
+	@Override
+	public void getWps(SuperUser superuser)
+	{
+		this.service.getWps(superuser,new DefaultCallBack());
+	}
+
 	@Override
 	public void updateUser(User user)
 	{
-		try
-		{
-			if (user.getId() != 1)
-				this.service.updateUser(user, new DefaultCallBack());
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+		this.service.updateUser(user , new DefaultCallBack());
+		
 	}
 
 	@Override
-	public void startQuiz()
+	public void updateWoordpakket(Woordpakket wp, SuperUser su)
 	{
-		this.service.startQuiz(new DefaultCallBack());
+		this.service.updateWoordpakket(wp, su, new DefaultCallBack());
+		
 	}
 
-	@Override
-	public void stopQuiz()
-	{
-		this.service.stopQuiz(new DefaultCallBack());
-
-	}
-
-	// registreert een gemaakte opgave
-	@Override
-	public void submitQuestion(Opgave opgave, int userid)
-	{
-		if (userid != 1)
-			this.service.submitQuestion(opgave, userid, new DefaultCallBack());
-		else
-			main.gast.addOpgave(opgave);
-	}
-
-	// sluist de antwoorden van de server door
+	
+	// sluist de antwoorden van de server door naar MainView
 	@SuppressWarnings("rawtypes")
 	private class DefaultCallBack implements AsyncCallback
 	{
@@ -210,17 +154,17 @@ public class ClientImp extends Composite implements ClientImpInterface
 				main.handleEvent((DataEvent) result);
 			}
 
-			// de vorige resultaten van de user uit de database
-			if (result instanceof FeedbackContainer)
-			{
-				main.setFeedbackContainer((FeedbackContainer) result);
-			}
 		}
 	}
 
-	public Tafeltrainer3Gui getGui()
-	{
-		return this.gui;
-	}
+
+
+	
+
+
+	
+
+	
+	
 
 }

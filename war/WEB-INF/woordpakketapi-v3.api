@@ -1,0 +1,209 @@
+{
+  "extends" : "thirdParty.api",
+  "abstract" : false,
+  "root" : "https://spelleritus-superuser.appspot.com/_ah/api",
+  "name" : "woordpakketapi",
+  "version" : "v3",
+  "description" : "Een API om woordpakketten te beheren",
+  "defaultVersion" : false,
+  "adapter" : {
+    "bns" : "https://spelleritus-superuser.appspot.com/_ah/spi",
+    "deadline" : 65.0,
+    "type" : "lily"
+  },
+  "auth" : {
+    "allowCookieAuth" : false
+  },
+  "frontendLimits" : {
+    "unregisteredUserQps" : -1,
+    "unregisteredQps" : -1,
+    "unregisteredDaily" : -1,
+    "rules" : [ ]
+  },
+  "cacheControl" : {
+    "type" : "no-cache",
+    "maxAge" : 0
+  },
+  "methods" : {
+    "woordpakketapi.getwpbyid" : {
+      "path" : "woordpakketapi/getwpbyid",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "afr.spelleritustest.service.WoordpakkettenServiceAPI.getWpById",
+      "request" : {
+        "parameters" : {
+          "id" : {
+            "type" : "int64",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "woordpakketapi.insertwoordpakket" : {
+      "path" : "woordpakketapi/addwoordpakket",
+      "httpMethod" : "POST",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "afr.spelleritustest.service.WoordpakkettenServiceAPI.addWoordpakket",
+      "request" : {
+        "parameters" : {
+          "identifier" : {
+            "type" : "string",
+            "required" : true
+          },
+          "description" : {
+            "type" : "string",
+            "required" : false
+          },
+          "contents" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "woordpakketapi.listwoordpakketten" : {
+      "path" : "woordpakketapi/listwoordpakketten",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "afr.spelleritustest.service.WoordpakkettenServiceAPI.listWoordpakketten",
+      "request" : {
+        "parameters" : {
+          "cursor" : {
+            "type" : "string",
+            "required" : false
+          },
+          "limit" : {
+            "type" : "int32",
+            "required" : false
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "woordpakketapi.searchwoordpakketen" : {
+      "path" : "woordpakketapi/listwoordpakketten",
+      "httpMethod" : "POST",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "afr.spelleritustest.service.WoordpakkettenServiceAPI.searchWoordpakketten",
+      "request" : {
+        "parameters" : {
+          "searchterm" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "woordpakketapi.updatewoordpakket" : {
+      "path" : "woordpakket",
+      "httpMethod" : "PUT",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "afr.spelleritustest.service.WoordpakkettenServiceAPI.updateWoordPakket",
+      "request" : {
+        "body" : "autoTemplate(backendRequest)",
+        "bodyName" : "resource"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    }
+  },
+  "descriptor" : {
+    "schemas" : {
+      "Woordpakket" : {
+        "id" : "Woordpakket",
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "format" : "int64"
+          },
+          "identifier" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "contents" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CollectionResponse_Woordpakket" : {
+        "id" : "CollectionResponse_Woordpakket",
+        "type" : "object",
+        "properties" : {
+          "items" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "Woordpakket"
+            }
+          },
+          "nextPageToken" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "methods" : {
+      "afr.spelleritustest.service.WoordpakkettenServiceAPI.getWpById" : {
+        "response" : {
+          "$ref" : "Woordpakket"
+        }
+      },
+      "afr.spelleritustest.service.WoordpakkettenServiceAPI.addWoordpakket" : {
+        "response" : {
+          "$ref" : "Woordpakket"
+        }
+      },
+      "afr.spelleritustest.service.WoordpakkettenServiceAPI.listWoordpakketten" : {
+        "response" : {
+          "$ref" : "CollectionResponse_Woordpakket"
+        }
+      },
+      "afr.spelleritustest.service.WoordpakkettenServiceAPI.searchWoordpakketten" : {
+        "response" : {
+          "$ref" : "CollectionResponse_Woordpakket"
+        }
+      },
+      "afr.spelleritustest.service.WoordpakkettenServiceAPI.updateWoordPakket" : {
+        "request" : {
+          "$ref" : "Woordpakket"
+        },
+        "response" : {
+          "$ref" : "Woordpakket"
+        }
+      }
+    }
+  }
+}

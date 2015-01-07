@@ -5,21 +5,12 @@ import afr.tafeltrainer3.client.ClientImp;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Hyperlink;
-import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class LandingPage extends Composite 
 {
@@ -41,8 +32,8 @@ public class LandingPage extends Composite
 		flex1.setCellPadding(0);
 		flex1.setBorderWidth(0);
 		html = new HTML("E-mailadres is met succes geverifieerd; u bent vanaf nu \n een geregistreerde gebruiker."
-				+ " Wij wensen u en uw leerling(en) \n veel succes en plezier met de tafeltrainer! \n Aarzel niet"
-				+ " om bij vragen contact met ons op te nemen \n via apreinders74@gmail.com");
+				+ " Wij wensen u en uw leerling(en) \n veel succes en plezier met de Spelleritus! \n Aarzel niet"
+				+ " om bij vragen contact met ons op te nemen \n via <a>apreinders74@gmail.com</a>");
 		html.setStyleName("html_groot");
 		html.setWordWrap(true);
 		this.flex1.getFlexCellFormatter().setHeight(0, 0, "250px");
@@ -69,7 +60,7 @@ public class LandingPage extends Composite
 		@Override
 		public void onClick(ClickEvent event)
 		{
-			main.showPageLoginBegeleider();			
+			main.showPageStartPage();			
 		}
 		
 	}

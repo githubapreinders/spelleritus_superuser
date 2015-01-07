@@ -17,6 +17,8 @@ public class SuperUser implements Serializable
 	String password;
 	int emailfrequency;
 	String verificationcode;
+	String packages;
+	String sendaddress;
 	Boolean verified;
 	ArrayList <String> groups;
 	
@@ -26,6 +28,8 @@ public class SuperUser implements Serializable
 	}
 	
 	
+	
+
 	public SuperUser(String email, String password)
 	
 	{
@@ -61,15 +65,22 @@ public SuperUser(String name,String email, String password, int emailfrequency,b
 	this.verified = verified;
 }
 	
+public SuperUser(String name,String email, String password, int emailfrequency,String packages,boolean verified)
 
+{
+	this.name = name;
+	this.email = email;
+	this.password = password;
+	this.emailfrequency = emailfrequency;
+	this.packages = packages;
+	this.verified = verified;
+}
 
 	public String toString()
 	{
 		String returnstring = this.getName() + " ," + this.email + " ," + this.password ;
 		return returnstring;
 	}
-	
-	
 	
 	public String getVerificationcode() 
 	{
@@ -137,7 +148,29 @@ public SuperUser(String name,String email, String password, int emailfrequency,b
 		this.verified = verified;
 	}
 
-	
+	public String getPackages()
+	{
+		return packages;
+	}
+
+
+	public void setPackages(String packages)
+	{
+		this.packages = packages;
+	}
+
+
+	public String getSendaddress()
+	{
+		return sendaddress;
+	}
+
+
+	public void setSendaddress(String sendaddress)
+	{
+		this.sendaddress = sendaddress;
+	}
+
 
 	
 }

@@ -12,6 +12,7 @@
 	<extend-property name="locale" values="nl_NL" /> 
 	<extend-property name="locale" values="nl" />
 	<set-property-fallback name="locale" value="nl" /> -->
+<inherits name="com.google.gwt.resources.Resources" />
 
 
 	<!-- Specify the app entry point class. -->

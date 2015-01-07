@@ -7,14 +7,16 @@ import afr.tafeltrainer3.shared.SuperUser;
 public class EventSuperUserRetrieved extends DataEvent implements Serializable
 
 {
-public SuperUser superuser;
 
-	public SuperUser getSuperuser() 
+	private static final long serialVersionUID = 1L;
+	public SuperUser superuser;
+
+	public SuperUser getSuperuser()
 	{
 		return superuser;
 	}
-	
-	public void setSuperuser(SuperUser superuser) 
+
+	public void setSuperuser(SuperUser superuser)
 	{
 		this.superuser = superuser;
 	}

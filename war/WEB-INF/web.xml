@@ -1,10 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
-              http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
-	version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee                http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
-	<!-- Servlets -->
+	<!-- GWT Servlet for rpc calls -->
 	<servlet>
 		<servlet-name>exampleServlet</servlet-name>
 		<servlet-class>afr.tafeltrainer3.server.ServerImpl</servlet-class>
@@ -15,45 +11,21 @@
 		<url-pattern>/tafeltrainer3/simpleservice</url-pattern>
 	</servlet-mapping>
 
+	<!-- Servlet for backend  with android -->
 	<servlet>
-		<servlet-name>mailcronservletweekly</servlet-name>
-		<servlet-class>afr.tafeltrainer3.server.MailCronServlet
-		</servlet-class>
+		<servlet-name>SystemServiceServlet</servlet-name>
+		<servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
+		<init-param>
+			<param-name>services</param-name>
+			<param-value>afr.spelleritustest.service.WoordpakkettenServiceAPI</param-value>
+		</init-param>
 	</servlet>
-
 	<servlet-mapping>
-		<servlet-name>mailcronservletweekly</servlet-name>
-		<url-pattern>/tafeltrainer3/src/afr/tafeltrainer3/server/MailCronServlet
-		</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>mailcronservlettwoweekly</servlet-name>
-		<servlet-class>afr.tafeltrainer3.server.MailCronServletTwo
-		</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>mailcronservlettwoweekly</servlet-name>
-		<url-pattern>/tafeltrainer3/src/afr/tafeltrainer3/server/MailCronServletTwo
-		</url-pattern>
+		<servlet-name>SystemServiceServlet</servlet-name>
+		<url-pattern>/_ah/spi/*</url-pattern>
 	</servlet-mapping>
 
 
-	<servlet>
-		<servlet-name>mailcronservlettwoweekly3rd</servlet-name>
-		<servlet-class>afr.tafeltrainer3.server.MailCronServletThree
-		</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>mailcronservlettwoweekly3rd</servlet-name>
-		<url-pattern>/tafeltrainer3/src/afr/tafeltrainer3/server/MailCronServletThree
-		</url-pattern>
-	</servlet-mapping>
-	
-	
-	
 	<!-- Default page to serve -->
 	<welcome-file-list>
 		<welcome-file>Tafeltrainer3.html</welcome-file>
