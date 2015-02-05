@@ -15,8 +15,9 @@ import javax.inject.Named;
 import org.mortbay.log.Log;
 
 import afr.spelleritustest.dao.MySQLAccess;
-import afr.spelleritustest.entity.Woordpakket;
 import afr.spelleritustest.utils.Tools;
+import afr.tafeltrainer3.shared.SuperUser;
+import afr.tafeltrainer3.shared.Woordpakket;
 
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
@@ -28,10 +29,12 @@ import com.google.api.server.spi.response.NotFoundException;
 public class WoordpakkettenServiceAPI
 {
 	private static final  Logger LOGGER = Logger.getLogger(WoordpakkettenServiceAPI.class.getName());
-
+	private afr.tafeltrainer3.server.MySQLAccess mygoodoldsql = new afr.tafeltrainer3.server.MySQLAccess();
+	
 	public WoordpakkettenServiceAPI()
 	{
 		LOGGER.setLevel(Level.INFO);
+		
 	}
 
 	// TODO if the contentstring is empty only a 503 will be returned while it
@@ -104,6 +107,22 @@ public class WoordpakkettenServiceAPI
 		return new Woordpakket((long) 1, identifier, description, contents);
 	}
 
+	@ApiMethod(name = "getwpbyuserid", path = "woordpakketapi/getwpbyuserid")
+	public Woordpakket getWpByUserId(@Named("userid")int userid)
+	{
+		Woordpakket wp = null;
+		try
+		{
+			wp = mygoodoldsql.getCurrentWp(userid);
+		}
+		
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return wp;
+	}
+	
 	@ApiMethod(name = "getwpbyid", path = "woordpakketapi/getwpbyid")
 	public Woordpakket getWpById(@Named("id") long id) throws NotFoundException, BadRequestException
 	{
@@ -237,36 +256,22 @@ public class WoordpakkettenServiceAPI
 	}
 
 	@ApiMethod(name = "updatewoordpakket")
-	public Woordpakket updateWoordPakket(Woordpakket wp) throws BadRequestException, NotFoundException
+	public void updateWoordPakket(Woordpakket wp, @Named("emailsuperuser") String emailsuperuser) throws BadRequestException, NotFoundException
 	{
 		if (wp.getId() <= 0)
 		{
 			throw new BadRequestException("Vul een id in");
 		}
 
-		PreparedStatement query = null;
 		Connection conn = null;
+		boolean succes = false;
 		try
 		{
-			conn = MySQLAccess.getConn();
-			query = conn.prepareStatement("select * from spelleritus.woordpakketten where id =?");
-			query.setInt(1, wp.getId().intValue());
-			ResultSet rs = query.executeQuery();
-			if (rs.next())
-			{
-				query.clearBatch();
-				query = conn.prepareStatement("update description,contents from spelleritus.woordpakketten where id=?");
-				query.setInt(1, wp.getId().intValue());
-				int i = query.executeUpdate();
-				if (i != 1)
-				{
-					throw new NotFoundException("Update is niet gelukt...");
-				}
-			} else
-			{
-				throw new NotFoundException("We hebben het bestand niet gevonden, probeer een andere zoekterm.");
-			}
-		} catch (SQLException e)
+			SuperUser su = new SuperUser();
+			su.setEmail(emailsuperuser);
+			succes = mygoodoldsql.updateWoordpakket(wp, su);
+		} 
+		catch (Exception e)
 		{
 			e.printStackTrace();
 			Log.debug("Error in connecting to db");
@@ -281,7 +286,7 @@ public class WoordpakkettenServiceAPI
 					e.printStackTrace();
 				}
 		}
-		return wp;
+		
 
 	}
 

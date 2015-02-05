@@ -650,7 +650,8 @@ p
 	font-size: 12px;
 	color: white;
 	background: url('blauw4.png');
-	border-radius : 15px;
+	border-radius : 10px;
+	padding : 3px;
 }
 
 

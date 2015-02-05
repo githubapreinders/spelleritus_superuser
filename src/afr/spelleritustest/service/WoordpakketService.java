@@ -3,7 +3,7 @@ package afr.spelleritustest.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import afr.spelleritustest.entity.Woordpakket;
+import afr.tafeltrainer3.shared.Woordpakket;
 
 public class WoordpakketService {
 

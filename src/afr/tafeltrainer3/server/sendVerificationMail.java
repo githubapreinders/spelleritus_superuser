@@ -2,6 +2,7 @@ package afr.tafeltrainer3.server;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;

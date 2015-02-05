@@ -25,18 +25,18 @@
     "maxAge" : 0
   },
   "methods" : {
-    "woordpakketapi.getwpbyid" : {
-      "path" : "woordpakketapi/getwpbyid",
+    "woordpakketapi.getwpbyuserid" : {
+      "path" : "woordpakketapi/getwpbyuserid",
       "httpMethod" : "GET",
       "authLevel" : "NONE",
       "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
       "audiences" : [ ],
       "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
-      "rosyMethod" : "afr.spelleritustest.service.WoordpakkettenServiceAPI.getWpById",
+      "rosyMethod" : "afr.spelleritustest.service.WoordpakkettenServiceAPI.getWpByUserId",
       "request" : {
         "parameters" : {
-          "id" : {
-            "type" : "int64",
+          "userid" : {
+            "type" : "int32",
             "required" : true
           }
         },
@@ -66,6 +66,27 @@
           },
           "contents" : {
             "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "woordpakketapi.getwpbyid" : {
+      "path" : "woordpakketapi/getwpbyid",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "afr.spelleritustest.service.WoordpakkettenServiceAPI.getWpById",
+      "request" : {
+        "parameters" : {
+          "id" : {
+            "type" : "int64",
             "required" : true
           }
         },
@@ -122,7 +143,7 @@
       }
     },
     "woordpakketapi.updatewoordpakket" : {
-      "path" : "woordpakket",
+      "path" : "void/{emailsuperuser}",
       "httpMethod" : "PUT",
       "authLevel" : "NONE",
       "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
@@ -130,11 +151,17 @@
       "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
       "rosyMethod" : "afr.spelleritustest.service.WoordpakkettenServiceAPI.updateWoordPakket",
       "request" : {
+        "parameters" : {
+          "emailsuperuser" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
         "body" : "autoTemplate(backendRequest)",
         "bodyName" : "resource"
       },
       "response" : {
-        "body" : "autoTemplate(backendResponse)"
+        "body" : "empty"
       }
     }
   },
@@ -176,12 +203,17 @@
       }
     },
     "methods" : {
-      "afr.spelleritustest.service.WoordpakkettenServiceAPI.getWpById" : {
+      "afr.spelleritustest.service.WoordpakkettenServiceAPI.getWpByUserId" : {
         "response" : {
           "$ref" : "Woordpakket"
         }
       },
       "afr.spelleritustest.service.WoordpakkettenServiceAPI.addWoordpakket" : {
+        "response" : {
+          "$ref" : "Woordpakket"
+        }
+      },
+      "afr.spelleritustest.service.WoordpakkettenServiceAPI.getWpById" : {
         "response" : {
           "$ref" : "Woordpakket"
         }
@@ -198,9 +230,6 @@
       },
       "afr.spelleritustest.service.WoordpakkettenServiceAPI.updateWoordPakket" : {
         "request" : {
-          "$ref" : "Woordpakket"
-        },
-        "response" : {
           "$ref" : "Woordpakket"
         }
       }

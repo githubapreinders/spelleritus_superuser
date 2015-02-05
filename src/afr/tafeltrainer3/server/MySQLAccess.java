@@ -564,6 +564,8 @@ public class MySQLAccess
 				user.getPassword(), user.getHouindegaten(), user.getCurrentwp(), user.getExtrawp());
 	}
 
+	// Updates an existing wp , or inserts a new one if the identifier is
+	// changed by the superuser
 	public boolean updateWoordpakket(Woordpakket wp, SuperUser su)
 	{
 		boolean result = false;
@@ -593,11 +595,11 @@ public class MySQLAccess
 				preparedStatement.setString(3, wp.getContents());
 				preparedStatement.executeUpdate();
 				preparedStatement = connect.prepareStatement("select * from spelleritus.woordpakketten");
-				resultSet =  preparedStatement.executeQuery();
+				resultSet = preparedStatement.executeQuery();
 				resultSet.last();
 				int newid = -1;
 				newid = resultSet.getInt("id");
-				if(newid>0)
+				if (newid > 0)
 				{
 					preparedStatement = connect.prepareStatement("select * from spelleritus.begeleider where email=?");
 					preparedStatement.setString(1, su.getEmail());
@@ -605,12 +607,12 @@ public class MySQLAccess
 					resultSet.first();
 					StringBuilder str = new StringBuilder(resultSet.getString("haspackages"));
 					str.append(" " + String.valueOf(newid));
-					preparedStatement = connect.prepareStatement("update from spelleritus.begeleider set haspackages = ? where email=?");
+					preparedStatement = connect
+							.prepareStatement("update from spelleritus.begeleider set haspackages = ? where email=?");
 					preparedStatement.setString(1, str.toString());
 					preparedStatement.setString(2, su.getEmail());
 					preparedStatement.executeUpdate();
 				}
-				
 
 			}
 
@@ -881,6 +883,50 @@ public class MySQLAccess
 		BigDecimal bd = new BigDecimal(value);
 		bd = bd.setScale(places, BigDecimal.ROUND_HALF_UP);
 		return bd.doubleValue();
+	}
+
+	public Woordpakket getCurrentWp(int userid)
+	{
+		connect = getConn();
+		Woordpakket wp = null;
+		try
+		{
+			preparedStatement = connect.prepareStatement("select * from spelleritus.user where id=?");
+			preparedStatement.setInt(1, userid);
+			resultSet = preparedStatement.executeQuery();
+			int currentpackage = 0 ;
+			while(resultSet.next())
+			{
+				currentpackage = resultSet.getInt("currentpackage");
+			}
+			if(currentpackage > 0)
+			{
+				preparedStatement = connect.prepareStatement("select * from spelleritus.woordpakketten where id = ?");
+				preparedStatement.setInt(1, currentpackage);
+				resultSet = preparedStatement.executeQuery();
+				while(resultSet.next())
+				{
+					wp = new Woordpakket((long)resultSet.getInt("id"), resultSet.getString("identifier"), resultSet.getString("description"),resultSet.getString("contents"));
+				}
+			}
+			resultSet.close();
+			connect.close();
+			
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		} finally
+		{
+			if (connect != null)
+				try
+				{
+					connect.close();
+				} catch (SQLException e)
+				{
+					e.printStackTrace();
+				}
+		}
+		return wp;
 	}
 
 }

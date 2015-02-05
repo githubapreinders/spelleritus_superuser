@@ -1,5 +1,6 @@
 package afr.tafeltrainer3.shared;
 import afr.tafeltrainer3.client.events.DataEvent;
+
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
